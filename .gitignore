@@ -1,0 +1,5 @@
+# exclude everything
+tools/*
+
+# exception to the rule
+!tools/.gitkeep 
