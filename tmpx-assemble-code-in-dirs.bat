@@ -5,6 +5,12 @@ rem Set the root directory for your code
 set "rootDir=c64-code"
 cd /d "%rootDir%"
 
+rem Set path to TMPx assembler executable
+set "TMPxPath=tools\TMPx\windows-i386\TMPx"
+
+rem Initialize current path
+set "currentPath=!CD!"
+
 :main
 rem List all folders and .asm files in the current directory
 set index=1
@@ -29,6 +35,7 @@ rem Validate user input for directory
 if defined dir[%choice%] (
     set chosenDir=!dir[%choice%]!
     cd "!chosenDir!"
+    set "currentPath=!CD!"
     goto main
 )
 
@@ -41,15 +48,13 @@ if not defined file[%choice%] (
 rem Assemble the chosen file using TMPx
 set filename=!file[%choice%]!
 
-rem Change back to the root directory for assembly
-cd /d "%rootDir%"
-
 rem Construct full paths
-set "fullpath=!cd!\!filename!"
+set "asmFullPath=!currentPath!\!filename!"
+set "prgFullPath=!asmFullPath:.asm=.prg!"
 
 rem Assemble the chosen file using TMPx
-if exist "!fullpath!" (
-    start cmd /k "cd .. && tools\TMPx\windows-i386\TMPx -i "!fullpath!" -o "!fullpath:.asm=.prg!""
+if exist "!asmFullPath!" (
+    start cmd /k "cd /d "!currentPath!" && "!TMPxPath!" -i "!asmFullPath!" -o "!prgFullPath!""
 ) else (
     echo File not found: !filename!
     exit /b 1
