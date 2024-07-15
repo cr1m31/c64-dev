@@ -21,4 +21,4 @@ if not defined file[%choice%] (
 rem Assemble the chosen file using TMPx
 set filename=!file[%choice%]!
 
-start cmd /k "tools\TMPx\windows-i386\TMPx -i c64-code\!filename!.asm -o c64-code\!filename!.prg"
+start cmd /k "c64-tools\TMPx\windows-i386\TMPx -i c64-code\!filename!.asm -o c64-code\!filename!.prg"

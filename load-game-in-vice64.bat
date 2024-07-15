@@ -21,4 +21,4 @@ if not defined file[%choice%] (
 rem Launch VICE with the chosen file
 set filename=!file[%choice%]!
 
-start cmd /k "tools\vice64\bin\x64sc c64-code\!filename!.prg"
+start cmd /k "c64-tools\vice64\bin\x64sc c64-code\!filename!.prg"

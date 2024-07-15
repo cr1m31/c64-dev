@@ -1,0 +1,10 @@
+c64-code\listasmtest.asm
+c64-code\listasmtest2.asm
+c64-code\alphabet-display\alphabet-fill-screen.asm
+c64-code\alphabet-display\alphabet-lowercase.asm
+c64-code\alphabet-display\alphabet-uppercase.asm
+c64-code\alphabet-display\chartest2.asm
+c64-code\display-sprites\displaysprite.asm
+c64-code\display-sprites\displaysprite2.asm
+c64-code\includespritedata\displaysincludeprite.asm
+c64-code\includespritedata\includespritedata.asm

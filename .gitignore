@@ -1,5 +1,5 @@
 # exclude everything
-tools/*
+c64-tools/*
 
 # exception to the rule
-!tools/.gitkeep 
+!c64-tools/.gitkeep 
