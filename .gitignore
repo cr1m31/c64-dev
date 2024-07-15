@@ -1,3 +1,7 @@
 # exclude everything
 c64-tools/*
+
 list-of-asm-files.txt
+
+# exception to the rule
+!c64-tools/.gitkeep 
