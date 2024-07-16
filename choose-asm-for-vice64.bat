@@ -23,9 +23,12 @@ if not defined file[%choice%] (
 rem Assemble the chosen file using TMPx
 set filename=!file[%choice%]!
 
+rem Remove the .asm extension from the filename
+set "filename_without_ext=!filename:.asm=!"
+
 rem Check if filename contains spaces and quote if necessary
-set "filename=%filename:"=""%"
+set "filename_without_ext=%filename_without_ext:"=""%"
 
-echo !filename!
+echo !filename_without_ext!
 
-start cmd /k "c64-tools\vice64\bin\x64sc c64-code\!filename!.prg"
+start cmd /k "c64-tools\vice64\bin\x64sc !filename_without_ext!.prg"
