@@ -43,5 +43,5 @@ BUILD
     RTS               ; Return from subroutine
 
 	; DATA label included from the asm file below that contains the real data (include compatible with tmpx aka turbo macro pro
-	.include "includespritedata.asm"
+	.include "sprite-data.asm"
 	
