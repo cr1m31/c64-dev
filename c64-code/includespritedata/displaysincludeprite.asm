@@ -12,64 +12,72 @@
 
 F_MAIN = $0810
 
-	LDA #$0D	;using block 13 for sprite0
-	STA $07F8
-	
-	lda #$0C ; using block 12 for sprite 1
-	sta $07F9
+    LDA #$0D    ; using block 13 for sprite0
+    STA $07F8
+    
+    LDA #$0C    ; using block 12 for sprite 1
+    STA $07F9
 
-; enable sprite 0
-    lda #$01
-    sta $d015
-	
-; enable sprite 1 
-	lda #$02
-	sta $d015
+; Enable sprite 0
+    LDA #$01
+    STA $d015
     
-   ;build the sprite
-	LDX #0
-BUILD_JAR	
-	LDA DATA_jar,X
-	STA $0340,X
-	INX
-	CPX #63
-	BNE BUILD_JAR
-	
+; Enable sprite 1
+    LDA #$02
+    ORA $d015  ; Keep sprite 0 enabled as well
+    STA $d015
+
+; Enable multicolor mode for sprite 1
+    LDA #$02
+    STA $d01c  ; Set bit 1 for multicolor sprite 1
+    
+; Build the first sprite
+    LDX #0
+BUILD_JAR
+    LDA DATA_jar,X
+    STA $0340,X
+    INX
+    CPX #64
+    BNE BUILD_JAR
+
+; Build the second sprite
+    LDX #0
 BUILD_WATER
-	lda DATA_water,X
-	sta $0350,X
-	INX
-	cpx #064
-	BNE BUILD_WATER
+    LDA DATA_water,X
+    STA $0400,X   ; Use different memory location for the second sprite
+    INX
+    CPX #64
+    BNE BUILD_WATER
     
-    ; Set sprite position
+; Set sprite 0 position
     LDA #$50          ; X position
     STA $D000
     LDA #$50          ; Y position
-    STA $D000
-    LDA #$00          ; Ensure MSB is 0
     STA $D001
-	
-	; set second sprite position
-	lda #$060
-	sta $D002
-	lda #$060
-	sta $D003
-	
-	; ensure MSB is 0
-	lda #$00
-	sta $D010
-	
-    ; Set sprite color
-    LDA #$07          ; Color value (1 = white)
+
+; Set sprite 1 position
+    LDA #$60          ; X position for sprite 1
+    STA $D002         ; X position of sprite 1
+    LDA #$60          ; Y position for sprite 1
+    STA $D003         ; Y position of sprite 1
+
+; Ensure MSB is 0
+    LDA #$00
+    STA $D010
+
+; Set sprite 0 color
+    LDA #$07          ; Color value (white)
     STA $D027
-	
-	; set second sprite color
-	lda #$08
-	sta $D028
-    
+
+; Set sprite 1 colors
+    LDA #$08          ; Main color (for example, light red)
+    STA $D028
+    LDA #$0C          ; Multicolor 1 (for example, blue)
+    STA $D025
+    LDA #$0E          ; Multicolor 2 (for example, green)
+    STA $D026
+
     RTS               ; Return from subroutine
 
-	; DATA label included from the asm file below that contains the real data (include compatible with tmpx aka turbo macro pro
-	.include "sprite-data.asm"
-	
+; DATA label included from the asm file below that contains the real data (include compatible with tmpx aka turbo macro pro
+    .include "sprite-data.asm"
