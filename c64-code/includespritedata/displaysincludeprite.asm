@@ -28,8 +28,9 @@ F_MAIN = $0810
     STA $d015
 
 ; Enable multicolor mode for sprite 1
-    LDA #$02
-    STA $d01c  ; Set bit 1 for multicolor sprite 1
+    LDA $D01C      ; Load current value of the sprite multicolor mode register
+    ORA #$02       ; Set bit 1 to enable multicolor mode for sprite 1
+    STA $D01C      ; Store the modified value back to the register
     
 ; Build the first sprite
     LDX #0
@@ -56,28 +57,31 @@ BUILD_WATER
     STA $D001
 
 ; Set sprite 1 position
-    LDA #$60          ; X position for sprite 1
+    LDA #$80          ; X position for sprite 1
     STA $D002         ; X position of sprite 1
-    LDA #$60          ; Y position for sprite 1
+    LDA #$80          ; Y position for sprite 1
     STA $D003         ; Y position of sprite 1
 
 ; Ensure MSB is 0
     LDA #$00
     STA $D010
 
-; Set sprite 0 color
-    LDA #$07          ; Color value (white)
+; Set sprite 0 color (single color mode)
+    LDA #$07          ; Color value (example: white)
     STA $D027
 
-; Set sprite 1 colors
-    LDA #$08          ; Main color (for example, light red)
-    STA $D028
-    LDA #$0C          ; Multicolor 1 (for example, blue)
-    STA $D025
-    LDA #$0E          ; Multicolor 2 (for example, green)
-    STA $D026
+; Set sprite 1 colors (multicolor mode)
+    
+    lda #$00
+	sta $D028
+	
+	LDA #$0b ; sprite multicolor 1
+	STA $D025
+	LDA #$01 ; sprite multicolor 2
+	STA $D026
 
     RTS               ; Return from subroutine
 
-; DATA label included from the asm file below that contains the real data (include compatible with tmpx aka turbo macro pro
+; DATA label included from the asm file below that contains the real data
+; (include compatible with tmpx aka turbo macro pro)
     .include "sprite-data.asm"
