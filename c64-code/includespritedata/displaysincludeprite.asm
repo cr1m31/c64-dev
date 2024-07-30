@@ -15,7 +15,7 @@ F_MAIN = $0810
     LDA #$0D    ; using block 13 for sprite0
     STA $07F8
     
-    LDA #$0C    ; using block 12 for sprite 1
+    LDA #$0E    ; using block 14 for sprite 1 (changed from $0C to $0E)
     STA $07F9
 
 ; Enable sprite 0
@@ -45,7 +45,7 @@ BUILD_JAR
     LDX #0
 BUILD_WATER
     LDA DATA_water,X
-    STA $0400,X   ; Use different memory location for the second sprite
+    STA $0380,X   ; Use different memory location for the second sprite
     INX
     CPX #64
     BNE BUILD_WATER
@@ -72,13 +72,11 @@ BUILD_WATER
 
 ; Set sprite 1 colors (multicolor mode)
     
-    lda #$00
-	sta $D028
-	
-	LDA #$0b ; sprite multicolor 1
+    LDA #$08 
 	STA $D025
-	LDA #$01 ; sprite multicolor 2
-	STA $D026
+	
+	
+	
 
     RTS               ; Return from subroutine
 
