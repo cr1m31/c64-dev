@@ -116,16 +116,19 @@ RESET_COUNTER
     RTS
 
 CHANGEBORDERCOLOR
-    LDA colorIndex  ; Change border color
-    STA $D020
-    INC colorIndex  ; Increment colorIndex
-    LDA colorIndex
-    CMP #$10        ; Check if colorIndex has reached 16
+    LDX colorIndex  ; Load the current colorIndex into the X register
+    INX             ; Increment the X register
+    STX colorIndex  ; Store the incremented value back into colorIndex
+    TXA             ; Transfer the X register into the accumulator
+    CMP #$10        ; Compare the accumulator with 16
     BNE SKIP_COLOR_RESET
-    LDA #$00        ; Reset colorIndex to 0
+    LDX #$00        ; Reset X register to 0 if it reached 16
+    STX colorIndex  ; Store 0 back into colorIndex
 SKIP_COLOR_RESET
-    STA colorIndex
-    RTS
+    LDA colorIndex  ; Load the colorIndex into the accumulator
+    STA $D020       ; Change the border color
+    RTS             ; Return from the subroutine
+
 
 SWITCHSPRITEDATA
     ; Load different sprite data based on spriteIndex
