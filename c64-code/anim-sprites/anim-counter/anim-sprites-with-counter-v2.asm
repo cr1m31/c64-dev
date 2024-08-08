@@ -18,37 +18,37 @@ F_MAIN = $0810
     lda #$03         ; individual color 
     sta $D027        ; Set sprite 0 color in its color register
 
-    lda #%00000001 ; select sprites 0 
-    sta $D015   ; Activate sprites register
+    lda #%00000001   ; select sprite 0 
+    sta $D015        ; Activate sprites register
 
     ; Sprite 0
     lda #$90   
-    sta $D000 ; Sprite 0 Horizontal Position X coordinate
+    sta $D000        ; Sprite 0 Horizontal Position X coordinate
     lda #$8F
-    sta $D001 ; Sprite 0 Vertical Position Y coordinate
+    sta $D001        ; Sprite 0 Vertical Position Y coordinate
     
-    lda #%00000001  ; Only the bits for sprite 0 is set
-    sta $D017 ; Sprite Vertical Expansion Register
+    lda #%00000001   ; Only the bit for sprite 0 is set
+    sta $D017        ; Sprite Vertical Expansion Register
 
-    lda #%00000001  ; Only the bits for sprite 0 is set 
-    sta $D01D ; Sprite Horizontal Expansion Register
+    lda #%00000001   ; Only the bit for sprite 0 is set 
+    sta $D01D        ; Sprite Horizontal Expansion Register
 
     ; Set sprite data pointers
     lda #$80
-    sta $07F8   ; Set the location to find SPRITE0 Shape Data Pointers
+    sta $07F8        ; Set the location to find SPRITE0 Shape Data Pointers
 
     ; Load initial sprite data into memory
-    ldx #$00   ; SET X=0
+    ldx #$00         ; SET X=0
     jsr SPR0LOADLOOP ; Load SPRITE0 into memory
 
 ; Load Sprite 0 data into memory ------------------------------
 
 SPR0LOADLOOP
     ; Load the first sprite (Sprite 0) into memory
-    ldx #$00   ; Reset X register for the first sprite
+    ldx #$00         ; Reset X register for the first sprite
 loop1
     lda stand_sprite_anim,x
-    sta $2000,x ; Load data into Sprite 0 memory ($2000)
+    sta $2000,x      ; Load data into Sprite 0 memory ($2000)
     inx
     cpx #$40
     bne loop1
@@ -84,7 +84,9 @@ STARTCOUNTER
     LDA #$00        ; Initialize frame counter
     STA framecounter
 
-    LDX #$00        ; Initialize color index
+    LDA #$00        ; Initialize color index
+    STA colorIndex
+
     LDA #$40        ; Initialize delay (number of frames)
     STA colorDelay
 
@@ -116,12 +118,13 @@ RESET_COUNTER
 CHANGEBORDERCOLOR
     LDA colorIndex  ; Change border color
     STA $D020
-    INX
-    CPX #$10        ; Check if colorIndex has reached 16
-    BNE SKIP_COLOR
-    LDX #$00
-SKIP_COLOR
-    STX colorIndex
+    INC colorIndex  ; Increment colorIndex
+    LDA colorIndex
+    CMP #$10        ; Check if colorIndex has reached 16
+    BNE SKIP_COLOR_RESET
+    LDA #$00        ; Reset colorIndex to 0
+SKIP_COLOR_RESET
+    STA colorIndex
     RTS
 
 SWITCHSPRITEDATA
