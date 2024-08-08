@@ -1,3 +1,5 @@
+; ANIM SPRITES -----------------------------------
+
 ; ----------------------------------------------------------
 ; Basic header
 ; ----------------------------------------------------------
@@ -12,87 +14,55 @@
 
 F_MAIN = $0810
 
-    ; Set up initial sprite configuration
-    lda #$03         ; Set sprite 0 color
-    sta $D027        ; Sprite 0 color register
+    ; Sprite 0
+    lda #$03         ; individual color 
+    sta $D027        ; Set sprite 0 color in its color register
 
-    lda #%00000001   ; Select sprite 0
-    sta $D015        ; Activate sprites register
+    lda #%00000001 ; select sprites 0 
+    sta $D015   ; Activate sprites register
 
-    ; Sprite 0 initial position
-    lda #$90
-    sta $D000        ; Sprite 0 Horizontal Position X coordinate
+    ; Sprite 0
+    lda #$90   
+    sta $D000 ; Sprite 0 Horizontal Position X coordinate
     lda #$8F
-    sta $D001        ; Sprite 0 Vertical Position Y coordinate
+    sta $D001 ; Sprite 0 Vertical Position Y coordinate
     
-    lda #%00000001   ; Enable sprite vertical expansion
-    sta $D017        ; Sprite Vertical Expansion Register
+    lda #%00000001  ; Only the bits for sprite 0 is set
+    sta $D017 ; Sprite Vertical Expansion Register
 
-    lda #%00000001   ; Enable sprite horizontal expansion
-    sta $D01D        ; Sprite Horizontal Expansion Register
+    lda #%00000001  ; Only the bits for sprite 0 is set 
+    sta $D01D ; Sprite Horizontal Expansion Register
 
-    ; Set initial sprite data pointer
-    lda #<walk_sprite_anim01  ; Low byte of address for walk_sprite_anim01
-    sta $FB          ; Store in zero-page location
-    lda #>walk_sprite_anim01  ; High byte of address for walk_sprite_anim01
-    sta $FC          ; Store in zero-page location
+    ; Set sprite data pointers
+    lda #$80
+    sta $07F8   ; Set the location to find SPRITE0 Shape Data Pointers
 
-    ; Load initial sprite data
-    ldx #$00         ; Set X=0
-    jsr SPR0LOADLOOP ; Load sprite data into sprite memory
+    ; Load sprite data into memory
+    ldx #$00   ; SET X=0
+    jsr SPR0LOADLOOP ; Load SPRITE0 into memory
 
-    ; Main loop
-MAIN_LOOP
-    ; Switch to walk_sprite_anim01
-    lda #<walk_sprite_anim01  ; Low byte of address
-    sta $FB          ; Set pointer to walk_sprite_anim01 low byte
-    lda #>walk_sprite_anim01  ; High byte of address
-    sta $FC          ; Set pointer to walk_sprite_anim01 high byte
-    ldx #$00         ; Set X=0
-    jsr SPR0LOADLOOP ; Load walk_sprite_anim01 data into sprite memory
-
-    ; Delay loop
-    ldx #$FF
-    ldy #$FF
-DELAY
-    ; Simple delay
-    dey
-    bne DELAY
-    dex
-    bne DELAY
-
-    ; Switch to stand_sprite_anim
-    lda #<stand_sprite_anim  ; Low byte of address
-    sta $FB          ; Set pointer to stand_sprite_anim low byte
-    lda #>stand_sprite_anim  ; High byte of address
-    sta $FC          ; Set pointer to stand_sprite_anim high byte
-    ldx #$00         ; Set X=0
-    jsr SPR0LOADLOOP ; Load stand_sprite_anim data into sprite memory
-
-    ; Delay loop
-    ldx #$FF
-    ldy #$FF
-DELAY2
-    ; Simple delay
-    dey
-    bne DELAY2
-    dex
-    bne DELAY2
-
-    ; Repeat animation loop
-    jmp MAIN_LOOP
+; Load Sprite 0 and Sprite 1 data into memory ------------------------------
 
 SPR0LOADLOOP
-    ; Load sprite data into sprite memory
-    ldy #$00         ; Start from the beginning of the sprite data
-    lda $FB          ; Load the low byte of the pointer from zero-page
-    ldx $FC          ; Load the high byte of the pointer from zero-page
-    lda ($FB),y      ; Load sprite data from the address pointed to by $FB
-    sta $2000,y      ; Store it in sprite memory (increment by Y each loop)
-    iny              ; Increment Y (next byte of sprite data)
-    cpy #$40         ; Check if all 64 bytes are processed (64 bytes per sprite)
-    bne SPR0LOADLOOP ; Continue if not done
-    rts
+    ; Load the first sprite (Sprite 0) into memory
+    ldx #$00   ; Reset X register for the first sprite
+loop1
+    lda stand_sprite_anim,x
+    sta $2000,x ; Load data into Sprite 0 memory ($2000)
+    inx
+    cpx #$40
+    bne loop1
+
+    ; Load the second sprite (Sprite 1) into memory
+    ldx #$00   ; Reset X register for the second sprite
+loop2
+    lda walk_sprite_anim01,x
+    sta $2040,x ; Load data into Sprite 1 memory ($2040)
+    inx
+    cpx #$40
+    bne loop2
+
+    jsr STARTCOUNTER
 
 stand_sprite_anim
     .byte $01,$80,$00,$03,$c0,$00,$03,$e0
@@ -113,3 +83,73 @@ walk_sprite_anim01
     .byte $80,$00,$01,$c0,$00,$03,$c0,$00
     .byte $03,$60,$00,$06,$34,$00,$06,$38
     .byte $00,$0c,$10,$00,$0f,$80,$00,$0d
+
+; COUNTER ----------------------------------------
+STARTCOUNTER
+    SEI             ; Disable interrupts
+    LDA #$35        ; Set interrupt to start on line 245
+    STA $D012       ; Write to VIC-II raster line register
+
+    LDA #$00        ; Initialize frame counter
+    STA framecounter
+
+    LDX #$00        ; Initialize color index
+    LDA #$40        ; Initialize delay (number of frames)
+    STA colorDelay
+
+    CLI             ; Enable interrupts
+MAINLOOP
+    JSR WAITFRAME   ; Wait for the next frame
+    JSR HANDLEFRAME ; Handle frame-specific logic
+    JMP MAINLOOP    ; Loop forever
+
+WAITFRAME
+    LDA #$F8        ; Wait until raster line $F8
+WAITLINE
+    CMP $D012
+    BNE WAITLINE
+    RTS
+
+HANDLEFRAME
+    DEC framecounter
+    BEQ RESET_COUNTER
+    RTS
+
+RESET_COUNTER
+    LDA colorDelay
+    STA framecounter  ; Reset frame counter
+    JSR CHANGEBORDERCOLOR  ; Perform the action
+    JSR SWITCHSPRITEDATA
+    RTS
+
+CHANGEBORDERCOLOR
+    LDA colorIndex  ; Change border color
+    STA $D020
+    INX
+    CPX #16
+    BNE SKIP_COLOR
+    LDX #$00
+SKIP_COLOR
+    STX colorIndex
+    RTS
+
+SWITCHSPRITEDATA
+    ; Increment the sprite pointer to point to the next frame
+    LDA $07F8       ; Load the current pointer value
+    CLC
+    ADC #1          ; Increment the pointer
+    CMP #$82        ; Check if it exceeds the last frame (0x82 for $2040)
+    BNE SKIP_RESET
+    LDA #$80        ; Reset to the first frame if reached end
+SKIP_RESET
+    STA $07F8       ; Update the pointer
+    RTS
+
+framecounter
+    .byte $00
+
+colorIndex
+    .byte $00
+
+colorDelay
+    .byte $40
