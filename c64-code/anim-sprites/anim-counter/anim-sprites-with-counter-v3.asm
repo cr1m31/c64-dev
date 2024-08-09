@@ -15,7 +15,7 @@
 F_MAIN = $0810
 
     ; Sprite 0
-    lda #$03         ; individual color 
+    lda #$05         ; individual color 
     sta $D027        ; Set sprite 0 color in its color register
 
     lda #%00000001   ; select sprite 0 
@@ -78,12 +78,12 @@ walk_sprite_anim01
 stop_sprite_anim
 	.byte $01,$80,$00,$03,$c0,$00,$03,$e0
 	.byte $00,$03,$c0,$00,$01,$00,$00,$03
-	.byte $80,$00,$07,$e0,$00,$07,$f0,$00
-	.byte $07,$f0,$00,$07,$f0,$00,$07,$f0
-	.byte $00,$03,$e8,$00,$03,$c0,$00,$01
-	.byte $80,$00,$01,$c0,$00,$03,$e0,$00
-	.byte $03,$e0,$00,$03,$70,$00,$03,$30
-	.byte $00,$03,$3c,$00,$07,$e0,$00,$0d
+	.byte $80,$00,$07,$c0,$00,$07,$e0,$00
+	.byte $07,$e0,$00,$07,$e0,$00,$07,$e0
+	.byte $00,$03,$e0,$00,$03,$c0,$00,$01
+	.byte $80,$00,$01,$80,$00,$01,$c0,$00
+	.byte $01,$c0,$00,$01,$c0,$00,$02,$c0
+	.byte $00,$03,$c0,$00,$03,$f8,$00,$0d
 
 ; COUNTER ----------------------------------------
 STARTCOUNTER
@@ -97,8 +97,8 @@ STARTCOUNTER
     LDA #$00        ; Initialize color index
     STA colorIndex
 
-    LDA #$40        ; Initialize delay (number of frames)
-    STA colorDelay
+    LDA #$20        ; Initialize delay (between frames)
+    STA waitDelay
 
     CLI             ; Enable interrupts
 MAINLOOP
@@ -119,7 +119,7 @@ HANDLEFRAME
     RTS
 
 RESET_COUNTER
-    LDA colorDelay
+    LDA waitDelay
     STA framecounter  ; Reset frame counter
     JSR CHANGEBORDERCOLOR  ; Perform the action
     JSR SWITCHSPRITEDATA
@@ -194,7 +194,7 @@ framecounter
 colorIndex
     .byte $00
 
-colorDelay
+waitDelay
     .byte $40
 
 spriteIndex
