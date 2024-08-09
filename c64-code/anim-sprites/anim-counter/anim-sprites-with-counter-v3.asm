@@ -148,7 +148,7 @@ SWITCHSPRITEDATA
     beq LOAD_WALK_SPRITE
     cmp #$02
     beq LOAD_STOP_SPRITE
-    jmp END
+    jmp ANIM_END
 
 LOAD_STAND_SPRITE
     ldx #$00
@@ -186,7 +186,7 @@ store_stop_sprite
     sta spriteIndex
     rts
 	
-END
+ANIM_END
 
 framecounter
     .byte $00
