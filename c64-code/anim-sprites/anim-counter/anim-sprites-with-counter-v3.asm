@@ -98,7 +98,7 @@ STARTCOUNTER
     STA colorIndex
 
     LDA #$20        ; Initialize delay (between frames)
-    STA waitDelay
+    STA counterDelay
 
     CLI             ; Enable interrupts
 MAINLOOP
@@ -119,7 +119,7 @@ HANDLEFRAME
     RTS
 
 RESET_COUNTER
-    LDA waitDelay
+    LDA counterDelay
     STA framecounter  ; Reset frame counter
     JSR CHANGEBORDERCOLOR  ; Perform the action
     JSR SWITCHSPRITEDATA
@@ -194,7 +194,7 @@ framecounter
 colorIndex
     .byte $00
 
-waitDelay
+counterDelay
     .byte $40
 
 spriteIndex
