@@ -1,0 +1,8 @@
+https://retro-programming.com/how-to-move-sprites-in-c64-assembly/
+
+https://codebase64.org/doku.php?id=base:vicii_memory_organizing
+
+sprite memory adresses:
+https://www.c64-wiki.com/wiki/Screen_RAM#:~:text=15360%20(%243C00)-,Memory%20addresses,-%5Bedit%20%7C
+
+
