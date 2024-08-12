@@ -12,12 +12,12 @@
 
 F_MAIN = $0810
 
-	LDA #$01	;using block n for sprite n
+	LDA #$0D	;using block n for sprite n
 	STA $07F8 	; last 8 bytes of screen ram 
 				; = $0400 + $03F8 = $07F8 
 				; = 1024 (screen ram debut) + 1016 (end of screen ram) 
 				; = 2040 = $07F8 
-
+				
 ; enable sprite 0
     lda #$01
     sta $d015
@@ -26,7 +26,12 @@ F_MAIN = $0810
 	LDX #0
 BUILD	
 	LDA DATA,X
-	STA $0340,X
+	STA $0340,X	; warning, need to give it the same address obtained by 
+				; the value in the corresponding 
+				; sprite pointer  ($07F8 = sprite 1)
+				; so the value is $0D = 13 (13 * 64 = 832) = ($0D * $40)
+				; and 832 in decimal = $0340 in hex so
+				; the sprite data is stored in address $0340
 	INX
 	CPX #63
 	BNE BUILD
