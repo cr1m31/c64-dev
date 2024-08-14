@@ -12,23 +12,25 @@
 
 F_MAIN = $0810
 
-	LDA #$0D	;using block n for sprite n
-	STA $07F8 	; sprite pointer last 8 bytes of screen ram 
+; enabling blocks and sprite pointers -------------------------------------
+	LDA #$0D	;using block 13 for sprite 1
+	STA $07F8 	; sprite 1 official pointer address, last 8 bytes of screen ram 
 				; = $0400 + $03F8 = $07F8 
 				; = 1024 (screen ram debut) + 1016 (end of screen ram) 
 				; = 2040 = $07F8 
 				
 	; sprite 2 pointer
-	LDA #$0E
-	STA $07F9
+	LDA #$0E 	; $0E = 14 so block 14 for sprite 2
+	STA $07F9	; sprite 2 official pointer address
 			
 	; enable sprite 1 and 2
-    lda #$03 ; hex 03 = 0011 in binary
-    sta $d015
+    lda #%00000011 	; hex 03 = 0000 0011 in binary = 8 bits = 1 byte
+    sta $d015 	; sta stores the value $03 that was loaded into the accumulator
+				; at the 16 bit address d015
 	
-   ;build the sprite 1 ---------------------
+;build all high resolution sprites -----------------------------------------
 	LDX #0
-BUILD_SPRITE_1	
+BUILD_SPRITES
 	LDA DATA_SPRITE_1,X
 	STA $0340,X	; warning, need to give it the same address obtained by 
 				; the value in the corresponding 
@@ -36,25 +38,16 @@ BUILD_SPRITE_1
 				; so the value is $0D = 13 (13 * 64 = 832) = ($0D * $40)
 				; and 832 in decimal = $0340 in hex so
 				; the sprite DATA_SPRITE_1 is stored in address $0340
-	INX
-	CPX #63
-	BNE BUILD_SPRITE_1
-	
-	;build the sprite 2 --------------------
-	LDX #0
-BUILD_SPRITE_2	
+				
+	; build sprite 2
 	LDA DATA_SPRITE_2,X
-	STA $0380,X	; warning, need to give it the same address obtained by 
-				; the value in the corresponding 
-				; sprite pointer  ($07F8 = sprite 1)
-				; so the value is $0D = 13 (13 * 64 = 832) = ($0D * $40)
-				; and 832 in decimal = $0340 in hex so
-				; the sprite DATA_SPRITE_1 is stored in address $0340
+	STA $0380,X			
+	
 	INX
 	CPX #63
-	BNE BUILD_SPRITE_2
+	BNE BUILD_SPRITES
     
-    ; Set sprite 1 position
+    ; Set sprites position -------------------------------------------------
     LDA #$50          ; X position
     STA $D000
     LDA #$50          ; Y position
@@ -63,14 +56,13 @@ BUILD_SPRITE_2
 	; set sprite 2 position
 	LDA #$80
 	STA $D002
-	LDA #$050
+	LDA #$50
 	STA $D003
 	
-	
-    LDA #$00          ; Ensure MSB is 0
-    STA $D010
+    LDA #%00000000          ; Ensure MSB is 0 !! a sprite that have a vertical position
+    STA $D010		; greater than 255 needs to have the corresponding sprite's bit value set to 1
 
-    ; Set sprite 1 color
+    ; Set sprites colors ---------------------------------------------------
     LDA #$07          ; Color value (1 = white)
     STA $D027
 	
