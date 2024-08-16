@@ -4,13 +4,13 @@
     *=$0801  ; org
 
     .byte $0c,$08,$0a,$00,$9e,$20,$32
-    .byte $30,$36,$34,$00,$00,$00,$00,$00
+    .byte $30,$36,$34,$00,$00,$00,$00,$00 ; 15 bytes
 
 ; ----------------------------------------------------------
 ; Main program starts at $0810
 ; ----------------------------------------------------------
 
-F_MAIN = $0810
+F_MAIN = $0810 ; $0801 + 15 bytes = $0810 (1 i hex = 1 byte)
 
 ; enabling blocks and sprite pointers -------------------------------------
 	LDA #$0D	;using block 13 for sprite 1
@@ -32,11 +32,8 @@ F_MAIN = $0810
 	LDX #0
 BUILD_SPRITES
 	LDA DATA_SPRITE_1,X
-	STA $0340,X	; warning, need to give it the same address obtained by 
-				; the value in the corresponding 
+	STA $0340,X	; warning, block value * 64 = (13 * 64 = 832) = $0340 (hex) 
 				; sprite pointer  ($07F8 = sprite 1)
-				; so the value is $0D = 13 (13 * 64 = 832) = ($0D * $40)
-				; and 832 in decimal = $0340 in hex so
 				; the sprite DATA_SPRITE_1 is stored in address $0340
 				
 	; build sprite 2
@@ -67,7 +64,7 @@ BUILD_SPRITES
     STA $D027
 	
 	; set sprite 2 color
-	LDA #$01
+	LDA #$0D
 	STA $D028
     
     RTS               ; Return from subroutine
