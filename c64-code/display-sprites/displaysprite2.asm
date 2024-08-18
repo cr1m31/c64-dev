@@ -51,7 +51,7 @@ BUILD_SPRITES
     STA $D001
 	
 	; set sprite 2 position
-	LDA #$80
+	LDA #$80		; x position
 	STA $D002
 	LDA #$50
 	STA $D003
