@@ -77,21 +77,39 @@ BUILD_SPRITES
 ; 	sprite movement ------------------------------
 	
  ; Wait Subroutine
-  ;; This will make the c64 wait for roughly one frame
-wait
-  lda #$FF    ; load 255 into A
-  cmp $D012   ; look if current rasterline equals 255
-  bne wait    ; if no, goto wait
-  ;rts         ; if yes, return from subroutine
-  
-  
+wait_for_raster
+	lda #$ff
+	cmp $d012
+	bne wait_for_raster
+	rts
+	
+ldx #0
+incrementx
+	jsr wait_for_raster
+	inx 
+	cpx #$01 ; moving speed the greater the slower
+	bne incrementx
+	
+	ldx#0
+	jsr move_down
+	bne incrementx
+	
 move_down
-  iny                       ; increment y position  
-  sty $D001   ; move sprite 0 to y position
-  jsr wait                  ; call wait subroutine
-  cpy #$C8                  ; are we at y=200?
-  bne move_down             ; if no, go to move_down
-
+	iny
+	sty $d001
+	cpy #$c8
+	bne incrementx
+	 
+	jsr move_down_sprite_2_fast
+	
+ldx #0
+move_down_sprite_2_fast
+	inx
+	stx $d003
+	cpx #$ff
+	bne move_down_sprite_2_fast
+	rts
+	
 
 ; Sprite DATA_SPRITE1 ------------------------------------
 DATA_SPRITE_1
